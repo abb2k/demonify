@@ -35,12 +35,16 @@ class $modify(MyLevelCell, LevelCell) {
     void loadFromLevel(GJGameLevel* p0){
         LevelCell::loadFromLevel(p0);
 
+        if (p0->m_levelType == GJLevelType::Editor) return;
+
         if (getDifficulty(m_level) >= 6){
             CCSprite* s = nullptr;
             if (m_mainLayer->getChildByID("difficulty-container")){
                 s = static_cast<CCSprite*>(m_mainLayer->getChildByID("difficulty-container")->getChildByID("difficulty-sprite"));
                 if (m_mainLayer->getChildByID("difficulty-container")->getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite"))
                     m_mainLayer->getChildByID("difficulty-container")->getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite")->setVisible(false);
+                if (m_mainLayer->getChildByID("difficulty-container")->getChildByID("gddp-difficulty"))
+                    m_mainLayer->getChildByID("difficulty-container")->getChildByID("gddp-difficulty")->setVisible(false);
             }
             else if (m_mainLayer->getChildByID("grd-demon-icon-layer")){
                 auto childArr = m_mainLayer->getChildByID("grd-demon-icon-layer")->getChildren();
@@ -83,6 +87,11 @@ class $modify(MyLevelCell, LevelCell) {
 
 #include <Geode/modify/LevelInfoLayer.hpp>
 class $modify(MyLevelInfoLayer, LevelInfoLayer) {
+
+    struct Fields{
+        CCSprite* demon = nullptr;
+    };
+
     static void onModify(auto& self) {
         auto _ = self.setHookPriority("LevelInfoLayer::init", -9999);
         _ = self.setHookPriority("LevelInfoLayer::levelDownloadFinished", -9999);
@@ -116,6 +125,12 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
             if (getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite"))
                 getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite")->setVisible(false);
 
+            if (getChildByID("gddp-difficulty"))
+                getChildByID("gddp-difficulty")->setVisible(false);
+
+            if (getChildByTag(69420))
+                getChildByTag(69420)->setVisible(false);
+
             CCObject* child;
             CCARRAY_FOREACH(getChildren(), child){
                 auto c = dynamic_cast<CCParticleSystemQuad*>(child);
@@ -131,15 +146,18 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
                 if (arr->count() > 0)
                     feature = static_cast<CCSprite*>(arr->objectAtIndex(0));
 
-            auto s2 = CCSprite::createWithSpriteFrameName("difficulty_06_btn_001.png");
-            s2->setPosition(s->getPosition() - ccp(0, 10));
-            this->addChild(s2);
+            if (m_fields->demon)
+                m_fields->demon->removeMeAndCleanup();
+
+            m_fields->demon = CCSprite::createWithSpriteFrameName("difficulty_06_btn_001.png");
+            m_fields->demon->setPosition(s->getPosition() - ccp(0, 10));
+            this->addChild(m_fields->demon);
 
             if (feature){
                 auto s2bg = CCSprite::createWithSpriteFrame(feature->displayFrame());
                 s2bg->setZOrder(-1);
-                s2bg->setPosition(s2->getContentSize() / 2);
-                s2->addChild(s2bg);
+                s2bg->setPosition(m_fields->demon->getContentSize() / 2);
+                m_fields->demon->addChild(s2bg);
             }
         }
     }
