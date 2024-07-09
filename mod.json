@@ -9,7 +9,7 @@
 	"id": "abb2k.demonify",
 	"tags": ["offline", "joke", "customization"],
 	"name": "demonify",
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"developer": "abb2k",
 	"description": "Changes the demons to the REAL demon difficulty!",
 	"settings": {
