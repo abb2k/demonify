@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
+
 /*
 -1 = auto, 0 = NA, 1 = Easy, 2 = Normal
 3 = Hard, 4 = Harder, 5 = Insane, 6 = Hard Demon
@@ -39,15 +40,16 @@ class $modify(MyLevelCell, LevelCell) {
 
         if (getDifficulty(m_level) >= 6){
             CCSprite* s = nullptr;
-            if (m_mainLayer->getChildByID("difficulty-container")){
-                s = static_cast<CCSprite*>(m_mainLayer->getChildByID("difficulty-container")->getChildByID("difficulty-sprite"));
-                if (m_mainLayer->getChildByID("difficulty-container")->getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite"))
-                    m_mainLayer->getChildByID("difficulty-container")->getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite")->setVisible(false);
-                if (m_mainLayer->getChildByID("difficulty-container")->getChildByID("gddp-difficulty"))
-                    m_mainLayer->getChildByID("difficulty-container")->getChildByID("gddp-difficulty")->setVisible(false);
+            if (auto diffCont = typeinfo_cast<CCNode*>(m_mainLayer->getChildByID("difficulty-container"))){
+                s = static_cast<CCSprite*>(diffCont->getChildByID("difficulty-sprite"));
+
+                if (auto dibS = typeinfo_cast<CCNode*>(diffCont->getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite")))
+                    dibS->setVisible(false);
+                if (auto gddpS = typeinfo_cast<CCNode*>(diffCont->getChildByID("gddp-difficulty")))
+                    gddpS->setVisible(false);
             }
-            else if (m_mainLayer->getChildByID("grd-demon-icon-layer")){
-                auto childArr = m_mainLayer->getChildByID("grd-demon-icon-layer")->getChildren();
+            else if (auto grdDiff = typeinfo_cast<CCNode*>(m_mainLayer->getChildByID("grd-demon-icon-layer"))){
+                auto childArr = grdDiff->getChildren();
 
                 s = static_cast<CCSprite*>(childArr->objectAtIndex(childArr->count() - 1));
                 if (s->getID() == "grd-infinity"){
@@ -61,8 +63,8 @@ class $modify(MyLevelCell, LevelCell) {
             auto s2 = CCSprite::createWithSpriteFrameName("difficulty_06_btn_001.png");
             s2->setPosition(s->getPosition());
 
-            if (m_mainLayer->getChildByID("difficulty-container")){
-                m_mainLayer->getChildByID("difficulty-container")->addChild(s2);
+            if (auto DiffCont = typeinfo_cast<CCNode*>(m_mainLayer->getChildByID("difficulty-container"))){
+                DiffCont->addChild(s2);
                 auto arr = s->getChildren();
                 CCSprite* feature = nullptr;
 
@@ -77,8 +79,8 @@ class $modify(MyLevelCell, LevelCell) {
                     s2->addChild(s2bg);
                 }
             }
-            else if (m_mainLayer->getChildByID("grd-demon-icon-layer")){
-                m_mainLayer->getChildByID("grd-demon-icon-layer")->addChild(s2);
+            else if (auto grdDiff = typeinfo_cast<CCNode*>(m_mainLayer->getChildByID("grd-demon-icon-layer"))){
+                grdDiff->addChild(s2);
             }
             
         }
@@ -90,6 +92,7 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 
     struct Fields{
         CCSprite* demon = nullptr;
+        bool didMoveParticals = false;
     };
 
     static void onModify(auto& self) {
@@ -115,29 +118,34 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
             auto s = static_cast<GJDifficultySprite*>(getChildByID("difficulty-sprite"));
             s->setVisible(false);
 
-            if (getChildByID("grd-difficulty")){
-                getChildByID("grd-difficulty")->removeMeAndCleanup();
+            if (auto grdDiff = typeinfo_cast<CCNode*>(getChildByID("grd-difficulty"))){
+                grdDiff->removeMeAndCleanup();
             }
-            if (getChildByID("grd-infinity")){
-                getChildByID("grd-infinity")->setVisible(false);
+            if (auto grdInf = typeinfo_cast<CCNode*>(getChildByID("grd-infinity"))){
+                grdInf->setVisible(false);
             }
 
-            if (getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite"))
-                getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite")->setVisible(false);
+            if (auto dibS = typeinfo_cast<CCNode*>(getChildByID("hiimjustin000.demons_in_between/between-difficulty-sprite")))
+                dibS->setVisible(false);
 
-            if (getChildByID("gddp-difficulty"))
-                getChildByID("gddp-difficulty")->setVisible(false);
+            if (auto gddpS = typeinfo_cast<CCNode*>(getChildByID("gddp-difficulty")))
+                gddpS->setVisible(false);
 
-            if (getChildByTag(69420))
-                getChildByTag(69420)->setVisible(false);
+            if (auto nlwFeature = typeinfo_cast<CCNode*>(getChildByTag(69420)))
+                nlwFeature->setVisible(false);
 
-            CCObject* child;
-            CCARRAY_FOREACH(getChildren(), child){
-                auto c = dynamic_cast<CCParticleSystemQuad*>(child);
-                if (c){
-                    c->setPositionY(c->getPositionY() - 7);
+            if (!m_fields->didMoveParticals){
+                bool foundParticals = false;
+                CCObject* child;
+                CCARRAY_FOREACH(getChildren(), child){
+                    if (auto c = typeinfo_cast<CCParticleSystemQuad*>(child)){
+                        c->setPositionY(c->getPositionY() - 7);
+                        foundParticals = true;
+                    }
                 }
+                m_fields->didMoveParticals = foundParticals;
             }
+            
 
             auto arr = s->getChildren();
             CCSprite* feature = nullptr;
@@ -171,6 +179,8 @@ class $modify(MyLevelSearchLayer, LevelSearchLayer) {
         if (Mod::get()->getSettingValue<bool>("remove-filters")){
             demonFilterSelectClosed(0);
 
+            
+
             schedule(schedule_selector(MyLevelSearchLayer::myUpdate));
         }  
 
@@ -178,12 +188,12 @@ class $modify(MyLevelSearchLayer, LevelSearchLayer) {
     }
 
     void myUpdate(float delta){
-        if (getChildByID("difficulty-filter-menu")->getChildByID("demon-type-filter-button"))
-            if (getChildByID("difficulty-filter-menu")->getChildByID("demon-type-filter-button")->isVisible())
-                getChildByID("difficulty-filter-menu")->getChildByID("demon-type-filter-button")->setVisible(false);
+        if (auto dTypeFilter = typeinfo_cast<CCNode*>(getChildByID("difficulty-filter-menu")->getChildByID("demon-type-filter-button")))
+            if (dTypeFilter->isVisible())
+                dTypeFilter->setVisible(false);
 
-        if (getChildByID("difficulty-filter-menu")->getChildByID("hiimjustin000.demons_in_between/quick-search-button"))
-            if (getChildByID("difficulty-filter-menu")->getChildByID("hiimjustin000.demons_in_between/quick-search-button")->isVisible())
-                getChildByID("difficulty-filter-menu")->getChildByID("hiimjustin000.demons_in_between/quick-search-button")->setVisible(false);
+        if (auto dibDTypeFilter = typeinfo_cast<CCNode*>(getChildByID("difficulty-filter-menu")->getChildByID("hiimjustin000.demons_in_between/quick-search-button")))
+            if (dibDTypeFilter->isVisible())
+                dibDTypeFilter->setVisible(false);
     }
 };
