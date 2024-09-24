@@ -1,5 +1,5 @@
 {
-	"geode": "3.2.0",
+	"geode": "3.7.1",
 	"gd": {
 		"win": "2.206",
 		"android": "2.206",
@@ -9,7 +9,7 @@
 	"id": "abb2k.demonify",
 	"tags": ["offline", "joke", "customization"],
 	"name": "demonify",
-	"version": "v1.0.1",
+	"version": "v1.0.2",
 	"developer": "abb2k",
 	"description": "Changes the demons to the REAL demon difficulty!",
 	"settings": {

@@ -1,3 +1,6 @@
+# 1.0.2
+- removed the demon rate button! because it is not needed anymore!! theres only one demon difficulty!!!
+
 # 1.0.1
 - improved code
 - made the mod conflict any other difficulty mod

@@ -115,6 +115,9 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 
     void refreshDiff(){
         if (getDifficulty(m_level) >= 6){
+            if (auto rateButton = this->getChildByID("right-side-menu")->getChildByID("rate-button"))
+                rateButton->setVisible(false);
+
             auto s = static_cast<GJDifficultySprite*>(getChildByID("difficulty-sprite"));
             s->setVisible(false);
 
