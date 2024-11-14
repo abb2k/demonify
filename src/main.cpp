@@ -200,3 +200,4 @@ class $modify(MyLevelSearchLayer, LevelSearchLayer) {
                 dibDTypeFilter->setVisible(false);
     }
 };
+
