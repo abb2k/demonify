@@ -1,5 +1,8 @@
+# 1.0.4
+- updated the mod for geode v4.0.0-beta.1
+
 # 1.0.3
-- updated the mod for geode v4.0.0
+- updated the mod for geode v4.0.0-alpha.1
 
 # 1.0.2
 - removed the demon rate button! because it is not needed anymore!! theres only one demon difficulty!!!
