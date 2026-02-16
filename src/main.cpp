@@ -139,13 +139,14 @@ class $modify(MyLevelInfoLayer, LevelInfoLayer) {
 
             if (!m_fields->didMoveParticals){
                 bool foundParticals = false;
-                CCObject* child;
-                CCARRAY_FOREACH(getChildren(), child){
+                for (const auto& child : this->getChildrenExt())
+                {
                     if (auto c = typeinfo_cast<CCParticleSystemQuad*>(child)){
                         c->setPositionY(c->getPositionY() - 7);
                         foundParticals = true;
                     }
                 }
+
                 m_fields->didMoveParticals = foundParticals;
             }
             
