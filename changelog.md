@@ -1,5 +1,8 @@
-# 1.0.6
+# 1.0.7
 - updated for geode V5!
+
+# 1.0.6
+- updated for geode V5 beta!
 
 # 1.0.5
 - iOS support :D
